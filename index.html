@@ -1,0 +1,614 @@
+import React, { useState, useEffect, ReactNode } from 'react';
+import { 
+  Brain, 
+  AlertTriangle, 
+  CheckCircle, 
+  GraduationCap, 
+  ShieldAlert, 
+  Lightbulb, 
+  ArrowRight,
+  Menu,
+  X,
+  RefreshCw,
+  ChevronUp,
+  BookOpen,
+  MessageSquareQuote,
+  ExternalLink
+} from 'lucide-react';
+
+// --- Type Definitions (Strict TypeScript for GitHub) ---
+interface NavItem {
+  id: string;
+  label: string;
+}
+
+interface QuestionOption {
+  text: string;
+  score: number;
+}
+
+interface Question {
+  text: string;
+  options: QuestionOption[];
+}
+
+interface FeatureCardProps {
+  icon: ReactNode;
+  title: string;
+  description: string;
+  color: string;
+  // Removed unused 'delay' prop to prevent TS linting errors
+}
+
+interface RiskCardProps {
+  title: string;
+  content: string;
+  icon?: ReactNode;
+}
+
+interface GuideStepProps {
+  number: string;
+  title: string;
+  text: string;
+}
+
+interface ResourceItemProps {
+  name: string;
+  desc: string;
+  tag: string;
+}
+
+// Main Application Component
+export default function App() {
+  const [activeSection, setActiveSection] = useState<string>('home');
+  const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false);
+  const [showScrollTop, setShowScrollTop] = useState<boolean>(false);
+
+  // Handle Scroll Effects
+  useEffect(() => {
+    const handleScroll = () => {
+      // Show/Hide Scroll to top button
+      if (window.scrollY > 300) {
+        setShowScrollTop(true);
+      } else {
+        setShowScrollTop(false);
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  const scrollToSection = (id: string) => {
+    const element = document.getElementById(id);
+    if (element) {
+      const offset = 80; // height of header
+      const bodyRect = document.body.getBoundingClientRect().top;
+      const elementRect = element.getBoundingClientRect().top;
+      const elementPosition = elementRect - bodyRect;
+      const offsetPosition = elementPosition - offset;
+
+      window.scrollTo({
+        top: offsetPosition,
+        behavior: 'smooth'
+      });
+      setActiveSection(id);
+      setIsMenuOpen(false);
+    }
+  };
+
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  // Navigation Items
+  const navItems: NavItem[] = [
+    { id: 'benefits', label: 'Lợi Ích' },
+    { id: 'risks', label: 'Tác Hại' },
+    { id: 'students', label: 'Lời Khuyên' },
+    { id: 'resources', label: 'Tài Liệu' }, // New Section
+    { id: 'quiz', label: 'Test Nhanh' },
+  ];
+
+  return (
+    <div className="min-h-screen bg-slate-50 font-sans text-slate-800 selection:bg-indigo-100 selection:text-indigo-900">
+      
+      {/* Navigation Bar */}
+      <nav className="fixed top-0 w-full bg-white/80 backdrop-blur-lg border-b border-slate-200/60 z-50 transition-all duration-300">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between h-20 items-center">
+            {/* Logo Area */}
+            <div 
+              className="flex-shrink-0 flex items-center gap-3 cursor-pointer group" 
+              onClick={scrollToTop}
+            >
+              <div className="relative">
+                <div className="absolute inset-0 bg-indigo-500 rounded-full blur opacity-20 group-hover:opacity-40 transition-opacity duration-300"></div>
+                <img 
+                  src="https://i.postimg.cc/nMXdKWZg/DALL-E-2025-03-05-23-44-12-A-modern-and-sleek-logo-for-a-website-about-AI-misuse-awareness-Design.webp" 
+                  alt="AI Awareness Logo" 
+                  className="h-12 w-12 rounded-full border-2 border-white shadow-md relative z-10 transform group-hover:scale-105 transition-transform duration-300" 
+                />
+              </div>
+              <div className="flex flex-col">
+                <span className="font-extrabold text-xl tracking-tight text-slate-900 leading-none">AI & Cuộc Sống</span>
+                <span className="text-xs text-indigo-600 font-medium tracking-wide">Smart Use, Smart Life</span>
+              </div>
+            </div>
+            
+            {/* Desktop Menu */}
+            <div className="hidden md:flex space-x-1">
+              {navItems.map((item) => (
+                <button
+                  key={item.id}
+                  onClick={() => scrollToSection(item.id)}
+                  className={`px-4 py-2 rounded-full text-sm font-semibold transition-all duration-300 ${
+                    activeSection === item.id 
+                      ? 'bg-indigo-50 text-indigo-600 shadow-sm' 
+                      : 'text-slate-600 hover:text-indigo-600 hover:bg-white/50'
+                  }`}
+                >
+                  {item.label}
+                </button>
+              ))}
+            </div>
+
+            {/* Mobile Menu Button */}
+            <div className="md:hidden">
+              <button
+                onClick={() => setIsMenuOpen(!isMenuOpen)}
+                className="text-slate-600 hover:text-indigo-600 p-2 rounded-lg hover:bg-slate-100 transition-colors"
+              >
+                {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Mobile Menu Dropdown */}
+        {isMenuOpen && (
+          <div className="md:hidden bg-white border-t border-slate-100 shadow-xl absolute w-full left-0 animate-in slide-in-from-top-5 duration-200">
+            <div className="px-4 pt-2 pb-4 space-y-2">
+              {navItems.map((item) => (
+                <button
+                  key={item.id}
+                  onClick={() => scrollToSection(item.id)}
+                  className="block w-full text-left px-4 py-3 rounded-xl text-base font-medium text-slate-600 hover:text-indigo-600 hover:bg-indigo-50 transition-all"
+                >
+                  {item.label}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+      </nav>
+
+      {/* Hero Section */}
+      <section id="home" className="pt-32 pb-20 md:pt-40 md:pb-32 px-4 relative overflow-hidden">
+        {/* Background Gradients */}
+        <div className="absolute top-0 right-0 -mr-20 -mt-20 w-[500px] h-[500px] bg-gradient-to-br from-indigo-200/30 to-purple-200/30 rounded-full blur-3xl opacity-60 animate-pulse"></div>
+        <div className="absolute bottom-0 left-0 -ml-20 -mb-20 w-[400px] h-[400px] bg-gradient-to-tr from-blue-200/30 to-teal-200/30 rounded-full blur-3xl opacity-60"></div>
+
+        <div className="max-w-7xl mx-auto text-center relative z-10">
+          <div className="inline-flex items-center px-4 py-2 rounded-full bg-white border border-indigo-100 text-indigo-700 text-sm font-bold mb-8 shadow-sm hover:shadow-md transition-shadow cursor-default">
+            <Lightbulb size={16} className="mr-2 text-yellow-500" />
+            <span>Trí tuệ nhân tạo: Công cụ hay Ông chủ?</span>
+          </div>
+          
+          <h1 className="text-5xl md:text-7xl font-black text-slate-900 mb-8 leading-tight tracking-tight">
+            Hiểu đúng để <br className="hidden md:block" />
+            <span className="bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-600 animate-gradient-x">
+              Làm chủ AI
+            </span>
+          </h1>
+          
+          <p className="mt-4 max-w-2xl mx-auto text-xl md:text-2xl text-slate-600 font-light leading-relaxed">
+            Công nghệ sinh ra để phục vụ con người. Đừng để sự tiện lợi làm mòn đi tư duy phản biện sắc bén của bạn.
+          </p>
+          
+          <div className="mt-12 flex flex-col sm:flex-row justify-center gap-4">
+            <button 
+              onClick={() => scrollToSection('benefits')}
+              className="px-8 py-4 rounded-full bg-indigo-600 text-white font-bold text-lg shadow-lg shadow-indigo-200 hover:bg-indigo-700 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex items-center justify-center gap-2"
+            >
+              Khám phá ngay <ArrowRight size={20} />
+            </button>
+            <button 
+              onClick={() => scrollToSection('quiz')}
+              className="px-8 py-4 rounded-full bg-white text-slate-700 font-bold text-lg border border-slate-200 shadow-sm hover:border-indigo-300 hover:text-indigo-600 hover:bg-indigo-50 transition-all duration-300"
+            >
+              Làm bài test nhanh
+            </button>
+          </div>
+        </div>
+      </section>
+
+      {/* Benefits Section */}
+      <section id="benefits" className="py-24 bg-white relative">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-20">
+            <h2 className="text-3xl font-bold text-slate-900 sm:text-5xl mb-6">Mặt Tích Cực</h2>
+            <p className="text-xl text-slate-600 max-w-2xl mx-auto">Khi được sử dụng như một "người cộng sự", AI mở ra những tiềm năng vô hạn.</p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-8">
+            <FeatureCard 
+              icon={<Brain className="h-10 w-10 text-emerald-500" />}
+              title="Tăng Năng Suất Gấp Đôi"
+              description="Xử lý nhanh các tác vụ lặp lại, tóm tắt tài liệu dài 50 trang chỉ trong 5 giây. Giúp bạn có thêm thời gian cho tư duy sâu."
+              color="bg-emerald-50/50 hover:bg-emerald-50 border-emerald-100"
+            />
+            <FeatureCard 
+              icon={<Lightbulb className="h-10 w-10 text-amber-500" />}
+              title="Khai Phá Ý Tưởng"
+              description="Bế tắc trong sáng tạo? AI đóng vai trò như một người đồng đội brainstorm, đưa ra 10 góc nhìn mới lạ mà bạn chưa nghĩ tới."
+              color="bg-amber-50/50 hover:bg-amber-50 border-amber-100"
+            />
+            <FeatureCard 
+              icon={<GraduationCap className="h-10 w-10 text-indigo-500" />}
+              title="Học Tập Cá Nhân Hóa"
+              description="Biến AI thành gia sư riêng 24/7. Giải thích khái niệm khó theo phong cách ELI5 (Explain Like I'm 5) hoặc tạo lộ trình học riêng."
+              color="bg-indigo-50/50 hover:bg-indigo-50 border-indigo-100"
+            />
+          </div>
+        </div>
+      </section>
+
+      {/* Risks Section */}
+      <section id="risks" className="py-24 bg-slate-50 relative overflow-hidden">
+        {/* Background decoration */}
+        <div className="absolute top-0 right-0 w-64 h-64 bg-red-100 rounded-full blur-3xl opacity-40"></div>
+        <div className="absolute bottom-0 left-0 w-64 h-64 bg-orange-100 rounded-full blur-3xl opacity-40"></div>
+
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
+          <div className="text-center mb-20">
+            <span className="inline-block px-4 py-1 rounded-full bg-red-100 text-red-600 font-bold text-sm tracking-wider uppercase mb-4">Cảnh báo đỏ</span>
+            <h2 className="text-3xl font-bold text-slate-900 sm:text-5xl mb-6">Mặt Trái Của Việc Lạm Dụng</h2>
+            <p className="text-xl text-slate-600 max-w-2xl mx-auto">Sự tiện lợi quá mức có thể là "liều thuốc độc" cho trí tuệ nếu không tỉnh táo.</p>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-8 lg:gap-12">
+            <RiskCard 
+              title="Mất Tư Duy Phản Biện"
+              content="Não bộ giống như cơ bắp, nếu không dùng sẽ bị teo đi. Khi quen nhận đáp án sẵn từ AI, bạn dần mất khả năng phân tích, đánh giá và giải quyết vấn đề độc lập."
+              icon={<Brain className="text-red-500" />}
+            />
+            <RiskCard 
+              title="Ảo Tưởng Về Kiến Thức"
+              content="Đọc câu trả lời của AI tạo cảm giác 'mình đã hiểu', nhưng đó chỉ là trí nhớ ngắn hạn. Khi vào phòng thi thực tế không có máy móc, lỗ hổng kiến thức sẽ lộ rõ."
+              icon={<ShieldAlert className="text-orange-500" />}
+            />
+            <RiskCard 
+              title="Cạm Bẫy Đạo Văn"
+              content="Copy-paste từ AI mà không trích dẫn là vi phạm liêm chính học thuật. Các trường đại học hiện nay đều trang bị công cụ phát hiện AI với độ chính xác cao."
+              icon={<AlertTriangle className="text-yellow-500" />}
+            />
+            <RiskCard 
+              title="Tin Giả & Hallucination"
+              content="AI rất giỏi 'chém gió' một cách tự tin. Nó có thể bịa đặt số liệu, sự kiện lịch sử hoặc trích dẫn không tồn tại. Tin tưởng mù quáng là rủi ro cực lớn."
+              icon={<CheckCircle className="text-pink-500" />} // Using CheckCircle ironically or changing icon
+            />
+          </div>
+        </div>
+      </section>
+
+      {/* Student Guide Section - Dark Mode Theme */}
+      <section id="students" className="py-24 bg-slate-900 text-white relative overflow-hidden">
+        <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10"></div>
+        <div className="absolute top-0 left-0 -ml-20 -mt-20 w-96 h-96 rounded-full bg-indigo-600/30 blur-[100px]"></div>
+        <div className="absolute bottom-0 right-0 -mr-20 -mb-20 w-96 h-96 rounded-full bg-purple-600/30 blur-[100px]"></div>
+
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl font-bold sm:text-5xl mb-6">Cẩm Nang Sinh Tồn Thời AI</h2>
+            <p className="text-indigo-200 text-xl max-w-2xl mx-auto">
+              Làm chủ công nghệ thay vì để công nghệ làm chủ bạn.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-8">
+            <GuideStep 
+              number="01"
+              title="Quy tắc 80/20"
+              text="Hãy tự làm 80% công việc (lên ý tưởng, viết nháp, tư duy cốt lõi). Chỉ dùng AI cho 20% còn lại (kiểm tra lỗi ngữ pháp, format văn bản, gợi ý từ vựng)."
+            />
+            <GuideStep 
+              number="02"
+              title="AI là Copilot"
+              text="Hãy coi AI là 'cơ phó' hỗ trợ, còn bạn là 'cơ trưởng' ra quyết định. Đừng bao giờ giao phó toàn bộ bài làm cho máy móc."
+            />
+            <GuideStep 
+              number="03"
+              title="Luôn Fact-Check"
+              text="Mọi thông tin AI đưa ra chỉ là tham khảo. Hãy luôn đối chiếu với giáo trình, sách vở hoặc các nguồn chính thống uy tín."
+            />
+          </div>
+
+          {/* Quote Section */}
+          <div className="mt-16 bg-white/5 backdrop-blur-md rounded-2xl p-8 border border-white/10 text-center">
+            <MessageSquareQuote size={40} className="text-indigo-400 mx-auto mb-4" />
+            <p className="text-xl md:text-2xl font-light italic text-slate-200 mb-4">
+              "AI sẽ không thay thế con người. Nhưng những người biết sử dụng AI hiệu quả sẽ thay thế những người không biết."
+            </p>
+            <span className="text-indigo-400 font-bold uppercase tracking-widest text-sm">— Châm ngôn công nghệ</span>
+          </div>
+        </div>
+      </section>
+
+      {/* Resources Section (New) */}
+      <section id="resources" className="py-20 bg-indigo-50/50">
+        <div className="max-w-6xl mx-auto px-4">
+          <div className="flex items-center gap-3 mb-10">
+            <BookOpen className="text-indigo-600" />
+            <h2 className="text-2xl font-bold text-slate-900">Góc Tài Liệu & Công Cụ</h2>
+          </div>
+          
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <ResourceItem 
+              name="GPTZero / Turnitin"
+              desc="Công cụ kiểm tra xem văn bản có được viết bởi AI hay không. Hãy dùng để tự kiểm tra bài mình trước khi nộp."
+              tag="Check Đạo Văn"
+            />
+            <ResourceItem 
+              name="Google Scholar"
+              desc="Tìm kiếm tài liệu học thuật chính thống để đối chiếu (fact-check) thông tin mà AI cung cấp."
+              tag="Nghiên Cứu"
+            />
+            <ResourceItem 
+              name="Perplexity AI"
+              desc="Một công cụ AI tìm kiếm có trích dẫn nguồn gốc rõ ràng, giúp hạn chế rủi ro thông tin bịa đặt."
+              tag="Công Cụ Hỗ Trợ"
+            />
+          </div>
+        </div>
+      </section>
+
+      {/* Interactive Quiz Section */}
+      <section id="quiz" className="py-24 bg-white relative">
+        <div className="max-w-4xl mx-auto px-4">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold text-slate-900 sm:text-4xl mb-4">Thử Thách: Bạn Có Phụ Thuộc AI?</h2>
+            <p className="text-slate-600 text-lg">Trả lời trung thực 3 câu hỏi sau để nhận đánh giá.</p>
+          </div>
+          
+          <div className="bg-white rounded-3xl shadow-xl border border-slate-100 overflow-hidden">
+            <SimpleQuiz />
+          </div>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="bg-slate-900 text-slate-400 py-16 border-t border-slate-800">
+        <div className="max-w-7xl mx-auto px-4">
+          <div className="grid md:grid-cols-3 gap-12 mb-12">
+            <div>
+              <div className="flex items-center gap-3 mb-6 text-white">
+                <img src="https://i.postimg.cc/nMXdKWZg/DALL-E-2025-03-05-23-44-12-A-modern-and-sleek-logo-for-a-website-about-AI-misuse-awareness-Design.webp" alt="Logo" className="h-10 w-10 rounded-full grayscale hover:grayscale-0 transition-all" />
+                <span className="text-xl font-bold">AI Awareness</span>
+              </div>
+              <p className="text-slate-500 leading-relaxed">
+                Dự án phi lợi nhuận nhằm nâng cao nhận thức cộng đồng về việc sử dụng trí tuệ nhân tạo có trách nhiệm trong giáo dục và đời sống.
+              </p>
+            </div>
+            
+            <div>
+              <h4 className="text-white font-bold mb-6">Liên Kết Nhanh</h4>
+              <ul className="space-y-3">
+                {navItems.map(item => (
+                  <li key={item.id}>
+                    <button onClick={() => scrollToSection(item.id)} className="hover:text-indigo-400 transition-colors">
+                      {item.label}
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            <div>
+              <h4 className="text-white font-bold mb-6">Kết Nối</h4>
+              <p className="mb-4">Bạn có câu chuyện về AI muốn chia sẻ?</p>
+              <button className="px-6 py-2 rounded-lg bg-indigo-600 text-white font-medium hover:bg-indigo-700 transition-colors w-full md:w-auto">
+                Gửi Email Góp Ý
+              </button>
+            </div>
+          </div>
+          
+          <div className="pt-8 border-t border-slate-800 text-center flex flex-col md:flex-row justify-between items-center gap-4">
+            <p className="text-sm">
+              &copy; {new Date().getFullYear()} Lục Văn Phương. All rights reserved.
+            </p>
+            <div className="text-sm text-slate-600 flex items-center gap-2">
+              <span>Made with</span>
+              <Brain size={14} className="text-indigo-500" />
+              <span>& Coffee</span>
+            </div>
+          </div>
+        </div>
+      </footer>
+
+      {/* Scroll To Top Button */}
+      <button
+        onClick={scrollToTop}
+        className={`fixed bottom-8 right-8 p-3 rounded-full bg-indigo-600 text-white shadow-lg hover:bg-indigo-700 transition-all duration-300 transform z-40 ${
+          showScrollTop ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0 pointer-events-none'
+        }`}
+      >
+        <ChevronUp size={24} />
+      </button>
+
+    </div>
+  );
+}
+
+// --- Sub-components (Enhanced Styling) ---
+
+function FeatureCard({ icon, title, description, color }: FeatureCardProps) {
+  return (
+    <div className={`group p-8 rounded-3xl border transition-all duration-300 hover:shadow-xl hover:-translate-y-2 bg-white ${color}`}>
+      <div className="bg-white p-4 rounded-2xl shadow-sm inline-block mb-6 group-hover:scale-110 transition-transform duration-300">
+        {icon}
+      </div>
+      <h3 className="text-xl font-bold text-slate-900 mb-4">{title}</h3>
+      <p className="text-slate-600 leading-relaxed">{description}</p>
+    </div>
+  );
+}
+
+function RiskCard({ title, content, icon }: RiskCardProps) {
+  return (
+    <div className="flex gap-6 p-6 rounded-2xl hover:bg-white hover:shadow-lg transition-all duration-300 group">
+      <div className="flex-shrink-0 mt-1 p-3 bg-white rounded-xl shadow-sm h-fit group-hover:scale-110 transition-transform">
+        {icon || <AlertTriangle className="h-6 w-6 text-red-500" />}
+      </div>
+      <div>
+        <h3 className="text-lg font-bold text-slate-900 mb-3 group-hover:text-indigo-700 transition-colors">{title}</h3>
+        <p className="text-slate-600 leading-relaxed">{content}</p>
+      </div>
+    </div>
+  );
+}
+
+function GuideStep({ number, title, text }: GuideStepProps) {
+  return (
+    <div className="bg-white/5 backdrop-blur-sm p-8 rounded-2xl border border-white/10 hover:bg-white/10 hover:border-indigo-500/50 transition-all duration-300 group">
+      <span className="text-5xl font-black text-transparent bg-clip-text bg-gradient-to-b from-indigo-400 to-transparent mb-6 block group-hover:scale-110 transition-transform origin-left">{number}</span>
+      <h3 className="text-xl font-bold text-white mb-4 group-hover:text-indigo-300 transition-colors">{title}</h3>
+      <p className="text-slate-300 leading-relaxed">{text}</p>
+    </div>
+  );
+}
+
+function ResourceItem({ name, desc, tag }: ResourceItemProps) {
+  return (
+    <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-100 hover:shadow-md hover:border-indigo-200 transition-all">
+      <div className="flex justify-between items-start mb-3">
+        <h4 className="font-bold text-slate-900 text-lg">{name}</h4>
+        <ExternalLink size={16} className="text-slate-400" />
+      </div>
+      <span className="inline-block px-2 py-1 bg-slate-100 text-slate-600 text-xs rounded mb-3 font-medium">
+        {tag}
+      </span>
+      <p className="text-slate-600 text-sm">{desc}</p>
+    </div>
+  );
+}
+
+function SimpleQuiz() {
+  const [score, setScore] = useState<number>(0);
+  const [currentQ, setCurrentQ] = useState<number>(0);
+  const [showResult, setShowResult] = useState<boolean>(false);
+
+  const questions: Question[] = [
+    {
+      text: "Khi giáo viên giao bài tập về nhà, điều đầu tiên bạn làm là gì?",
+      options: [
+        { text: "Mở ChatGPT/AI lên và copy đề bài vào ngay lập tức.", score: 3 },
+        { text: "Tự suy nghĩ dàn ý trước, chỉ dùng AI khi bí ý tưởng.", score: 1 },
+        { text: "Làm hoàn toàn bằng sức mình, tra cứu sách vở.", score: 0 }
+      ]
+    },
+    {
+      text: "Bạn có thường kiểm tra lại (fact-check) thông tin mà AI cung cấp không?",
+      options: [
+        { text: "Hiếm khi, tôi thấy nó viết khá chuẩn.", score: 3 },
+        { text: "Thỉnh thoảng, với những thông tin quan trọng.", score: 1 },
+        { text: "Luôn luôn đối chiếu với nguồn khác.", score: 0 }
+      ]
+    },
+    {
+      text: "Nếu ngày mai AI biến mất, bạn có tự tin hoàn thành tốt các bài tập không?",
+      options: [
+        { text: "Khó đấy, tôi quen dùng nó rồi.", score: 3 },
+        { text: "Sẽ chậm hơn chút, nhưng vẫn làm tốt.", score: 0 },
+      ]
+    }
+  ];
+
+  const handleAnswer = (points: number) => {
+    const newScore = score + points;
+    if (currentQ < questions.length - 1) {
+      setScore(newScore);
+      setCurrentQ(currentQ + 1);
+    } else {
+      setScore(newScore);
+      setShowResult(true);
+    }
+  };
+
+  const resetQuiz = () => {
+    setScore(0);
+    setCurrentQ(0);
+    setShowResult(false);
+  };
+
+  if (showResult) {
+    let resultTitle = "";
+    let resultMsg = "";
+    let colorClass = "";
+    let icon = null;
+
+    if (score <= 2) {
+      resultTitle = "Xuất sắc! Người dùng thông thái";
+      resultMsg = "Bạn đang kiểm soát công nghệ rất tốt. Hãy duy trì thói quen tư duy độc lập này nhé.";
+      colorClass = "bg-emerald-50 text-emerald-900 border-emerald-200";
+      icon = <Brain className="h-12 w-12 text-emerald-500 mb-4" />;
+    } else if (score <= 5) {
+      resultTitle = "Cảnh báo nhẹ: Hãy cẩn thận";
+      resultMsg = "Bạn đang bắt đầu dựa dẫm vào AI. Hãy cố gắng tự làm nhiều hơn trước khi nhờ đến sự trợ giúp.";
+      colorClass = "bg-amber-50 text-amber-900 border-amber-200";
+      icon = <AlertTriangle className="h-12 w-12 text-amber-500 mb-4" />;
+    } else {
+      resultTitle = "Báo động đỏ: Lệ thuộc cao!";
+      resultMsg = "Có vẻ bạn đang để AI làm thay việc của não bộ. Hãy cai nghiện dần bằng cách tự viết dàn ý trước khi mở máy tính.";
+      colorClass = "bg-red-50 text-red-900 border-red-200";
+      icon = <ShieldAlert className="h-12 w-12 text-red-500 mb-4" />;
+    }
+
+    return (
+      <div className={`p-12 text-center animate-in zoom-in duration-300 ${colorClass}`}>
+        <div className="flex justify-center">{icon}</div>
+        <h3 className="text-3xl font-bold mb-4">{resultTitle}</h3>
+        <p className="text-xl mb-8 opacity-90 leading-relaxed">{resultMsg}</p>
+        <button 
+          onClick={resetQuiz}
+          className="inline-flex items-center px-6 py-3 bg-white border border-current rounded-full shadow-sm hover:bg-slate-50 font-bold transition-all transform hover:scale-105"
+        >
+          <RefreshCw size={20} className="mr-2" /> Làm lại bài test
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <div className="p-8 md:p-12">
+      <div className="mb-8 flex justify-between items-end">
+        <span className="text-sm font-bold text-slate-400 uppercase tracking-widest">Câu hỏi {currentQ + 1}/{questions.length}</span>
+        <div className="w-1/3 h-2 bg-slate-100 rounded-full overflow-hidden">
+          <div 
+            className="h-full bg-indigo-500 transition-all duration-500 ease-out"
+            style={{ width: `${((currentQ + 1) / questions.length) * 100}%` }}
+          ></div>
+        </div>
+      </div>
+      
+      <h3 className="text-2xl md:text-3xl font-bold text-slate-900 mb-8 min-h-[5rem]">
+        {questions[currentQ].text}
+      </h3>
+
+      <div className="space-y-4">
+        {questions[currentQ].options.map((opt, idx) => (
+          <button
+            key={idx}
+            onClick={() => handleAnswer(opt.score)}
+            className="w-full text-left p-6 rounded-2xl border-2 border-slate-100 hover:border-indigo-500 hover:bg-indigo-50/50 transition-all duration-200 flex justify-between items-center group bg-white"
+          >
+            <span className="text-lg text-slate-700 group-hover:text-indigo-900 font-medium">{opt.text}</span>
+            <div className="h-8 w-8 rounded-full border-2 border-slate-200 group-hover:border-indigo-500 flex items-center justify-center group-hover:bg-indigo-500 transition-colors">
+              <ArrowRight size={16} className="text-white opacity-0 group-hover:opacity-100" />
+            </div>
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
